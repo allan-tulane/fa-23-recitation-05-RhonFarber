@@ -34,28 +34,55 @@ def make_huffman_tree(f):
     # create a new node z with x and y as children,
     # insert z into the priority queue (using an empty character "")
     while (p.qsize() > 1):
-        # TODO
+      x = p.get()
+      y = p.get()
+      p.put(TreeNode(x, y, (x.data[0] + y.data[0], "")))
         
     # return root of the tree
     return p.get()
 
 # perform a traversal on the prefix code tree to collect all encodings
 def get_code(node, prefix="", code={}):
-    # TODO - perform a tree traversal and collect encodings for leaves in code
-    pass
+    # perform a tree traversal and collect encodings for leaves in code
+    # base case
+    if node.right == None and node.left == None:
+      code[node.data[1]] = prefix
+      return
+    # recursive case
+    if node.left is not None:
+        get_code(node.left, prefix + "0", code)
+    if node.right is not None:
+        get_code(node.right, prefix + "1", code)
+
+    return code
 
 # given an alphabet and frequencies, compute the cost of a fixed length encoding
 def fixed_length_cost(f):
-    # TODO
-    pass
+  count = 0 # counts the total number of characters in the file
+  length = math.ceil(math.log2(len(f))) # number of bits needed to encode each character
+  for frequency in f.values():
+    count += frequency
+  return length * count
+    
 
 # given a Huffman encoding and character frequencies, compute cost of a Huffman encoding
 def huffman_cost(C, f):
-    # TODO
-    pass
+  cost = 0
+  for char, frequencies in f.items():
+    char_cost = len(C[char]) * frequencies
+    cost += char_cost
+  return cost
+  
 
+# a) each text file:
 f = get_frequencies('f1.txt')
-print("Fixed-length cost:  %d" % fixed_length_cost(f))
-T = make_huffman_tree(f)
+print("f1.txt Fixed-length cost:  %d" % fixed_length_cost(f))
+ali = get_frequencies('alice29.txt')
+asy = get_frequencies('asyoulik.txt')
+fie = get_frequencies('fields.c')
+gra = get_frequencies('grammar.lsp')
+
+
+T = make_huffman_tree(gra)
 C = get_code(T)
-print("Huffman cost:  %d" % huffman_cost(C, f))
+print("Huffman cost:  %d" % huffman_cost(C, gra))
